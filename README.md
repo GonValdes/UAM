@@ -1,9 +1,8 @@
 # UAM
 Urban Air Mobility Individual Research Project Thesis. MSc in Aerospace Dynamics at Cranfield University
-
 Code is based on the thesis, provided as documentation. Written using MATLABv2019b, Simulink and Simscape. 
 
-### AVL 
+### AVL
 folder includes the documentation needed to run AVL alone. Can be used for any aircraft aerodynamic evaluation within the limits of vortex lattice method. 
 
 ### Optimization 
