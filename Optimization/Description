@@ -1,0 +1,4 @@
+These scripts can be used to optimize the propeller and airframe geometry considering the aerodynamic performance for certain flight conditions. 
+Current flight conditions evaluated are cruise at 300km/h-1000m and hover at 0m. 
+Optimization scheme, airframe geometry and aerodynamic model are presented in the correspondent images. Propeller performance is obtained with QPROP.
+mat files included some of the results obtained. Data may not be clean, including several variables not necessary within the optimization. 
