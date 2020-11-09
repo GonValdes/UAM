@@ -7,6 +7,6 @@ Urban Air Mobility Individual Research Project Thesis. MSc in Aerospace Dynamics
 
 **Model** of the full aircraft does not include battery as it was not necessary for implementation in the flight simulator. Powerplant with battery model can be found in the battery folder inside Model. Run Initialization_UAM_v2 to obtain all the necessary data. Model defined in Urban_Air_Mobility_v3.slx. For additional scripts for simulation (e.g. flight condition definition) please contact Gonzalo.
 
-**Response surface** includes the scripts necessary to create the metamodel/response surface. Use of regression and neural networks. Response_surface_creation.m is the main script, an example batch of data is provided to run some tests. The optimization domain is quite narrowed in this batch, therefore regression would provide reasonable accuracy in that case.
+**Response surface** includes the scripts necessary to create the metamodel/response surface. Use of regression and neural networks. Response_surface_creation.m is the main script, an example batch of data is provided to run some tests. The optimization domain is quite narrowed in this batch, therefore regression would provide reasonable accuracy without the need of neural networks.
 
 Additional scripts can be provided by the author. In case of any doubt or further enquiries, please contact at gonzalovaldescernuda@gmail.com 
