@@ -4,7 +4,7 @@
 load('RS_AVL_CLEAN.mat')
 addpath('D:\misc_functs_matlab\ExportFigs')%Personal file for plotting figures
 
-Y = RS_AVL_CL0;% Choose variable to obtain
+Y = RS_AVL_Cm0;% Choose variable to obtain
 
 % Create Validation batch for each relevant aeroderivative
 randomPoints = round(rand(1000,1)*1000);
@@ -75,13 +75,13 @@ X = RS_AVL_input';
 T = Y;%Target, equivalent 
 Xi=[];%Initial input delays
 Ai=[];%Initial layer delay
-EW=1;%Error weights
+EW=[];%Error weights
 
 net = feedforwardnet(20);%Number of nodes in the neural network
 
 %options
 net.trainParam.epochs = 10000000;% Number of iterations/generations
-net.trainParam.time = 11*60; %time limit(s)
+net.trainParam.time = 11%*60; %time limit(s)
 % net.trainParam.min_grad = 10^-7; %Gradient limit
 net.trainParam.goal = 0;%Performance goal
 net.trainParam.max_fail = 100;%Maximum validation failures/ number of iterations with the NN not improving performance
@@ -90,10 +90,13 @@ net.trainParam.max_fail = 100;%Maximum validation failures/ number of iterations
 [mdl1NN,tr] = train(net,X,T,Xi,Ai,EW,'useParallel','yes','showResources','yes',...
     'useGPU','yes','CheckpointFile','MyCheckpoint','CheckpointDelay',120);
 
-i=1:length(RS_AVL_input);
-error1NN =predict(mdl1NN,RS_AVL_input(i,:))-Y(i)';%test batch
-error_validation1NN = predict(mdl1NN,validation_input)-validation_output';%validation batch
+%Calculate errors
+errorNN = mdl1NN(RS_AVL_input(:,:)')-Y(:)';%test batch
+error_validationNN = mdl1NN(validation_input')-validation_output;%validation batch
 
+%Obtain the MSE for the model
+MSE1_test = (sum(errorNN.^2)/length(Y);
+MSE1_validation =sum(error_validationNN.^2))/length(Y);
 
 %Other types of nets
 
@@ -104,22 +107,35 @@ algorithm = 'traingdm';%Change training algorithm. 'traingdm': Gradient descent 
 %'trainbr': Bayesian Regularization
 
 t_limit= 11*60;
-
 net2 = net_generation('cascadeforward',35,algorithm,t_limit);
-
 [mdl2NN,tr] = train(net2,X,T,Xi,Ai,EW,'useParallel','yes','showResources','yes',...
     'useGPU','yes','CheckpointFile','MyCheckpoint','CheckpointDelay',120);
-[mdl3NN,tr] = train(net3,X,T,Xi,Ai,EW,'useParallel','yes','showResources','yes',...
-    'useGPU','yes','CheckpointFile','MyCheckpoint','CheckpointDelay',120);
 
 
-error2NN =predict(mdl2NN,RS_AVL_input(i,:))-Y(i)';%test batch
-error_validation2NN = predict(mdl2NN,validation_input)-validation_output';%validation batch
+% Test for different neural networks
+net_type = {'feedforward','cascadeforward'}
+n_nodes = [25,35,45];
+algorithms = {'trainlm','trainrp','trainscg','trainbfg'};
 
-error3NN =predict(mdl3NN,RS_AVL_input(i,:))-Y(i)';%test batch
-error_validation3NN = predict(mdl3NN,validation_input)-validation_output';%validation batch
+net_aux = net_generation('cascadeforward',35,algorithm,t_limit);
+t_limit = 10*60;
 
-%Obtain the MSE for each model
-MSE1 = (sum(error1NN.^2)+sum(error_validation1.^2))/length(Y);
-MSE2 = (sum(error2NN.^2)+sum(error_validation2.^2))/length(Y);
-MSE3 = (sum(error3NN.^2)+sum(error_validation3.^2))/length(Y);
+for i=1:length(net_type)
+    for j=1:length(n_nodes)
+        for k=1:length(algorithms)
+           net_aux =  net_generation(net_type{i},n_nodes(j),algorithms{k},t_limit);
+           [mdlNN{i,j,k},tr] = train(net_aux,X,T,Xi,Ai,EW,'useParallel','yes','showResources','yes',...
+               'useGPU','yes','CheckpointFile','MyCheckpoint','CheckpointDelay',120);
+           
+           %Calculate errors
+           errorNN{i,j,k} = mdlNN{i,j,k}(RS_AVL_input(:,:)')-Y(:)';%test batch
+           error_validationNN{i,j,k} = mdlNN{i,j,k}(validation_input')-validation_output;%validation batch
+           
+           %Obtain the MSE for the model
+           MSE1_test{i,j,k} = sum(errorNN{i,j,k}.^2)/length(Y);
+           MSE1_validation{i,j,k} = sum(error_validationNN{i,j,k}.^2)/length(error_validationNN{i,j,k});
+
+        end
+    end
+end
+
