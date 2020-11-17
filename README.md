@@ -1,9 +1,9 @@
 # UAM
 Urban Air Mobility Individual Research Project Thesis. MSc in Aerospace Dynamics at Cranfield University. Code is based on the thesis, provided as documentation. Written using MATLABv2019b, Simulink and Simscape. 
 
-**AVL** folder includes the documentation needed to run AVL alone. Can be used for any aircraft aerodynamic evaluation within the limits of vortex lattice method. Script_AVL.m is the main script, everything can be run from there.
+**AVL** folder includes the documentation needed to run AVL, a vortex lattice method software from the MIT. It can be used for any aircraft aerodynamic evaluation within the limits of the method. Script_AVL.m is the main script, everything can be run from there.
 
-**Optimization** folder includes the assembly of the model for optimization, including propellers and different corrections. Main_Script.m to run optimization. Once aircraft is configured, Trimming3D.m obtain the trimming conditions. Additional trimming and performance analysis scripts can be provided by request.
+**Optimization** folder includes the assembly of the propeller and airframe aerodynamic models and the inertia calculation for optimization purposes, including the different corrections. Main_Script.m to run optimization. Once aircraft is configured, Trimming3D.m obtain the trimming conditions. Additional trimming and performance analysis scripts can be provided by request.
 
 **Model** of the full aircraft does not include battery as it was not necessary for implementation in the flight simulator. Powerplant with battery model can be found in the battery folder inside Model. Run Initialization_UAM_v2 to obtain all the necessary data. Model defined in Urban_Air_Mobility_v3.slx. For additional scripts for simulation (e.g. flight condition definition) please contact Gonzalo.
 
