@@ -23,7 +23,7 @@ function [cost_funct,sol,Q,rps,Q2,rps2,initialise,geo] = Cost_function_optiv5neu
 
 %% Aerodynamic Block
 % Obtain airframe geometry
-geo = get_geo(pars)
+[geo,initialise] = get_geo(pars)
 
 %% Flight condition
 % Obtain flight condition information
@@ -58,7 +58,7 @@ initialise.CDdinA = neural.CDdinA_neural(AVL_input');
 
 %% Propeller Block
 %Obtain forward propeller data
-prop = get_prop(pars)
+[prop,prop_cg_loc,prop_cg_locback] = get_prop(pars,initialise);
 
 %% Launch analysis and read data
 try
