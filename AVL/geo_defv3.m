@@ -9,7 +9,7 @@ function geo_defv3(filename,geo,initialise)
 %
 %   Created by: Gonzalo Valdes
 %   Created Date: 2020-Apr
-
+%   Reference : http://web.mit.edu/drela/Public/web/avl/avl_doc.txt
 
 fid = fopen(strcat(filename,'.avl'), 'w');
 
@@ -111,7 +111,7 @@ fprintf(fid,['#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace \n']);
 fprintf(fid,['0  ' num2str(geo.b_c*geo.outery_innerail/100) '  0  '...
       num2str(geo.Cr_c) '  '  num2str(geo.aoar_c)  ' \n']);
 fprintf(fid,['NACA \n']);
-fprintf(fid,[geo.airfoiltip_c ' \n']);
+fprintf(fid,[geo.airfoilroot_c ' \n']);
 fprintf(fid,['CLAF \n']);
 fprintf(fid,[num2str(1+0.77*str2num(geo.airfoilroot_c(3:4))/100) ' \n']);
 fprintf(fid,['#Cname   Cgain  Xhinge  HingeVec     SgnDup \n']);%Elevator
@@ -211,13 +211,11 @@ fprintf(fid,[num2str(1+0.77*str2num(geo.airfoil_fus(3:4))/100) ' \n']);
 fclose(fid);
 end
 
-function [value] = value_at_yposition(pos,root_value,tip_value,b)
-%returns value of the component(can be used for chord, aoa, thickness, sweep, whatever)
-%assuming linear changes
-
+function [c] = value_at_yposition(pos,cr,ct,b)
+%returns value of the component assuming linear behaviour
 %pos in percentage %
-
+%cr,ct,b in m
+%function can also be used for angle of attack instead of chord
 %change ct and cr for aoat and aoar
-
-value = (tip_value-root_value)*pos/100+root_value;
+c = (ct-cr)*pos/100+cr;
 end
