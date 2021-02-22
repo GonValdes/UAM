@@ -7,8 +7,8 @@ clc;
 
 %% Initialise needed variables
 %Change to path where all the scripts are found
-addpath('D:\Cranfield\IRP\Coding\Clean')
-dir.avl = 'D:\Cranfield\IRP\Coding\Clean';
+addpath('...\AVL')
+dir.avl = '...\AVL';
 
 filename.geo = 'a';
 
