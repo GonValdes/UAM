@@ -1,12 +1,6 @@
 Initialization_UAM_v2
 load('Trim_cruise.mat')
 
-simsetup.initialXYZ = [0 0 -1000];
-simsetup.initialUVW = [50 0 1];
-simsetup.initialEuler = [0 0 0]*180/pi ;
-
-simsetup.initialLatLong = [52.0732 -0.620928];% Cranfield airport
-
 %% Get initial data
 [ sizes , x0 , names ] = Urban_Air_Mobility_v3
 % x0 : initial condition of the state variables.
@@ -64,4 +58,4 @@ dxfix = [1:sizes(1)];dxfix([8 9]) = [];%What states you want to maintain constan
 
 %% Linearize the model
 
-[A,B,C,D]= linmod('Urban_Air_Mobility_v3',xtrim,utrim )
+[A,B,C,D] = linmod('Urban_Air_Mobility_v3',xtrim,utrim )

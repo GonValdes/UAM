@@ -14,7 +14,7 @@ clc
 
 %% Initialise and run model
 % Go to the folder where the Simulink model is found
-cd('');
+cd('C:\Users\gonza\OneDrive\Escritorio\Model');
 
 filename.model = 'Urban_Air_Mobility_v3.slx';
 filename.AVL = 'AVL_data.mat';
@@ -26,7 +26,6 @@ load(filename.AVL);
 % clearvars -except flight_con BackProp ForwProp battery motor geo initialise
 
 disp('Loading geometry and mass data ...')
-
 
 simsetup.h = 1000;
 % simsetup.M = 0.26;
