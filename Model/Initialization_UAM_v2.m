@@ -28,10 +28,10 @@ load(filename.AVL);
 disp('Loading geometry and mass data ...')
 
 
-simsetup.h = 1500;
-simsetup.M = 0.26;
+simsetup.h = 1000;
+% simsetup.M = 0.26;
 simsetup.mass = 2000;
-simsetup.CG = 4.45;%initialise.CG(2);
+simsetup.CG = initialise.CG(1);
 simsetup.g = 9.8065;
 
 % Interpolate to obtain Inertia matrix
@@ -48,12 +48,7 @@ mass.Inertia = [initialise.Ixx 0 initialise.Ixz
 disp('Loading engine data ...')
 % Load engine data
 propinitfull_v0;
-%% Initial conditions
-simsetup.initialXYZ = [0 0 -1000];
-simsetup.initialUVW = [50 0 1];
-simsetup.initialEuler = [0 0 0]*180/pi ;
 
-simsetup.initialLatLong = [52.0732 -0.620928];% Cranfield
 %% Dynamic pressure table 
 
 initialise.alt = [ -1000 0 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 15000 ...
@@ -92,3 +87,9 @@ initialise.landinggear.maingear.mu_kinetic_lat=0.5;
 [initialise.landinggear.aero] = A320_UC(initialise.landinggear.gear_positions(1,3), ...
     initialise.landinggear.gear_positions(3,3));
 
+%% Initial conditions
+simsetup.initialXYZ = [0 0 -1000];
+simsetup.initialUVW = [50 0 1];
+simsetup.initialEuler = [0 0 0]*180/pi ;
+
+simsetup.initialLatLong = [52.0732 -0.620928];% Cranfield
