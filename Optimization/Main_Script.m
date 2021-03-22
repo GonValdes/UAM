@@ -89,7 +89,7 @@ options = optimoptions('ga');
 options = optimoptions(options,'PlotInterval',1);
 options = optimoptions(options,'PlotFcn',{@gaplotbestindiv});%@gaplotscores
 %Others
-options = optimoptions(options,'FunctionTolerance',1e-1,'MaxGenerations',1000000,'MaxStallGenerations',10000,'MaxTime',3600*10);
+options = optimoptions(options,'FunctionTolerance',1e-1,'MaxGenerations',25,'MaxStallGenerations',25,'MaxTime',3600*10);
 options = optimoptions(options,'UseParallel',false)
 options = optimoptions(options,'PopulationSize',500);
 options = optimoptions(options,'Display','off');
@@ -140,7 +140,7 @@ options.DistanceMeasureFcn = {@distancecrowding,'genotype'};
 options = optimoptions(options,'ParetoFraction',0.15);
 
 %Stop Criteria
-options = optimoptions(options,'FunctionTolerance',1e-4,'MaxGenerations',1000000,'MaxStallGenerations',10000);%,'MaxTime',3600*10
+options = optimoptions(options,'FunctionTolerance',1e-1,'MaxGenerations',25,'MaxStallGenerations',25,'MaxTime',3600*20)
 options = optimoptions(options,'UseParallel',false);
 options = optimoptions(options,'PopulationSize',400);
 options = optimoptions(options,'Display','iter');
