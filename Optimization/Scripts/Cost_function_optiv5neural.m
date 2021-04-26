@@ -23,7 +23,7 @@ function [cost_funct,sol,Q,rps,Q2,rps2,initialise,geo] = Cost_function_optiv5neu
 
 %% Aerodynamic Block
 % Obtain airframe geometry
-[geo,initialise] = get_geo(pars)
+[geo,initialise] = get_geo(pars);
 
 %% Flight condition
 % Obtain flight condition information
@@ -100,6 +100,7 @@ try
         %% TRIM
         %% Operational point 1, cruise
         %Ranges in propeller runfile
+        Treq = pars(28);
         run.V = TAS;
         run.T = Treq;
         [~,~,~,~,~]=qprop_analysisv3...

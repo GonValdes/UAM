@@ -12,7 +12,7 @@ function [cost_funct] = Cost_function_optiv4neural_onlyProp_noTrim(TAS,Altitude,
 %         the airframe
 %% Aerodynamic Block
 % Obtain airframe geometry
-geo = get_geo(pars)
+[geo,initialise] = get_geo(pars);
 
 %% Flight condition
 % Obtain flight condition information
@@ -32,7 +32,7 @@ end
 
 %% Propeller Block
 %Obtain forward propeller data
-prop = get_prop(pars)
+[prop,prop_cg_loc,prop_cg_locback] = get_prop([zeros(1,10),pars(1:17),Treq,pars(18:19)],initialise);
 
 %% Launch analysis and read data
 try

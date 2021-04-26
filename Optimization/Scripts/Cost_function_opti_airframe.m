@@ -1,4 +1,4 @@
-function [cost_funct,sol,sol2] = Cost_function_opti_airframe_2speeds(TAS,Altitude,TAS2,pars,dir,filename,neural)
+function [cost_funct,sol,sol2] = Cost_function_opti_airframe(TAS,Altitude,TAS2,pars,neural)
 % Cost function considering only the airframe. Trim achieved using only
 % body aoa and elevator deflection. A second airspeed TAS2 is added to
 % included a stall speed constrain, where trim must be achieved for
@@ -53,7 +53,7 @@ try
     % Obtain initial estimation for angle of attack and elevator deflection
     aoa_0 = ((2000*9.81/(qbar*geo.S_w))-initialise.CL0)/initialise.CLa;
     if aoa_0>10*pi/180
-        aoa_0=10*pi/180;
+        aoa_0=9*pi/180;
     end
     eta_0 = (-initialise.Cm0 - initialise.Cma*aoa_0)/initialise.CmdinA;
     %Obtain spanwise location of mean aerodynamic chord
@@ -118,7 +118,7 @@ try
         %This is used to check what is failing. Is the elevator angle to
         %high? The aoa? Both?
          
-        aa=0;bb=0;cc=0;dd=0;
+        aa=0;bb=0;cc=0;dd=0;ee=0;
         if abs(sol2(1))>10.5*pi/180
             aa= abs(sol2(1))-10.5*pi/180;
         elseif abs(sol2(2))>35
@@ -134,21 +134,16 @@ try
         end
         %Use this information to define the value of the constrains
         if abs(sol(1))>4*pi/180 || (abs(sol(2))>1) || (abs(sol2(1))>10.5*pi/180) || (abs(sol2(2))>35) 
-            cost_funct = [8000,8000]+aa*1800/pi+bb*10+cc*1800/pi+dd*10+ee*1800/pi;
+            cost_funct = [8000]+aa*1800/pi+bb*10+cc*1800/pi+dd*10+ee*1800/pi;
         else
-            cost_funct = [90000,90000];
+            cost_funct = [90000];
         end
     else
         %Cost function
-        cost_funct = [Thrust_req,Thrust_req2];
+        cost_funct = [Thrust_req];
     end
 catch
-    cost_funct = [100000,100000];
-    
-    fclose('all');
-    if isfile(strcat(filename.qprop_results,'.txt'))
-        delete(strcat(filename.qprop_results,'.txt'));
-    end
+    cost_funct = [100000];
 end
 end
 
