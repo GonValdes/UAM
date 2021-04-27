@@ -1,15 +1,17 @@
 clear all;
 clc; 
 % All variables are in metric units except where stated
+% Now, just run it
 
-%% Establish the directories to work
-%Define the path to each folder/directory
-dir.work = 'C:\Users\gonza\OneDrive\Escritorio\Optimization';%Directory where AVL, qprop and xfoil are found
+%%  Define the path to the optimization folder.
+dir.work = matlab.desktop.editor.getActiveFilename;
+dir.work = fileparts(dir.work);
+
+%% Other directions/folders
 dir.scripts_aux = [dir.work,'\Scripts'];% Directory where all the scripts are found/scripts folder
 
 dir.qprop = dir.work; %qprop.directory
 dir.AVL = dir.qprop; %AVL.exe directory
-
 
 addpath(dir.scripts_aux)
 addpath(dir.work)
@@ -77,12 +79,16 @@ ub = [ub,[1020]];%it will be changed during script
 ub = [ub,[4.5,8]];
 
 %% Optimization 
-%Run optimization now. Three different stages according the procedure
+%Run optimization with three different stages according the procedure
 %described in the thesis:
 % Airframe optimization --> Propeller optimization --> Full aircraft
 % optimization
 %For each step, first run a genetic algorithm and then a pattern search algorithm
+profile -memory on;
+setpref('profiler','showJitLines',1);
+showJitLines = getpref('profiler','showJitLines',false);
 
+tstart = tic()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Start with the only airframe
 %Value constrains
@@ -94,8 +100,8 @@ options = optimoptions('ga');
 options = optimoptions(options,'PlotInterval',1);
 options = optimoptions(options,'PlotFcn',{@gaplotbestf});%@gaplotscores
 %Others
-options = optimoptions(options,'FunctionTolerance',1e-2,'MaxGenerations',1000000,'MaxStallGenerations',100,'MaxTime',3600*8);
-options = optimoptions(options,'UseParallel',true)
+options = optimoptions(options,'FunctionTolerance',1e-3,'MaxGenerations',1000000,'MaxStallGenerations',100)%'MaxTime',3600*8);
+options = optimoptions(options,'UseParallel',false);
 options = optimoptions(options,'PopulationSize',300);
 options = optimoptions(options,'Display','off');
 % options = optimoptions(options,'MutationFcn','crossoverheuristic');
@@ -113,7 +119,7 @@ A(1,1) = -1;A(1,2) = 1;B(1)=0;
 % options = optimoptions(options,'InitialPopulationMatrix',seeding_mat)
 
 %Go to the directory where qprop is found
-cd(dir.qprop)
+cd(dir.qprop);
 %Define the cost function
 fitness_funct = @(pars)Cost_function_opti_airframe(TAS,Altitude,TAS2,pars,neural);
 %You can test value with the seeding matrix
@@ -121,14 +127,14 @@ fitness_funct = @(pars)Cost_function_opti_airframe(TAS,Altitude,TAS2,pars,neural
 
 % Run the optimization
 [x_airframe,fval_airframe,exitflag,output,population_airframe,scores_airframe]...
-    = ga(fitness_funct,length(ub_airframe),A,B,[],[],lb_airframe,ub_airframe,[],options)
+    = ga(fitness_funct,length(ub_airframe),A,B,[],[],lb_airframe,ub_airframe,[],options);
 
 %Pattern search optimization
 options = optimoptions('patternsearch','FunctionTolerance',10^-4,...
-    'PlotFcn','psplotbestf','UseParallel',true);
+    'PlotFcn','psplotbestf','UseParallel',false);
 
 [x_airframe,fval_airframe,exitflag,output] = ...
-    patternsearch(fitness_funct,x_airframe,A,B,[],[],lb_airframe,ub_airframe,[],options)
+    patternsearch(fitness_funct,x_airframe,A,B,[],[],lb_airframe,ub_airframe,[],options);
 
 %Get a value to initialize the next cost function
 [~,sol_airframe]=Cost_function_opti_airframe(TAS,Altitude,TAS2,x_airframe,neural);
@@ -151,10 +157,10 @@ options.DistanceMeasureFcn = {@distancecrowding,'genotype'};
 options = optimoptions(options,'ParetoFraction',0.15);
 
 %Stop Criteria
-options = optimoptions(options,'FunctionTolerance',1e-3,'MaxGenerations',1000000,'MaxStallGenerations',100,'MaxTime',3600*10)
+options = optimoptions(options,'FunctionTolerance',1e-3,'MaxGenerations',1000000,'MaxStallGenerations',100);%,'MaxTime',3600*10);
 options = optimoptions(options,'UseParallel',false);
 options = optimoptions(options,'PopulationSize',400);
-options = optimoptions(options,'Display','iter');
+%options = optimoptions(options,'Display','iter');
 % ,'MaxTime',43200
 %Constraints
 B=[];
@@ -180,10 +186,10 @@ fitness_funct = @(pars)Cost_function_optiv4neural_onlyProp_noTrim(TAS,Altitude,p
 % scatter(fval_Prop(:,1)*4*pi,fval_Prop(:,2)*2*pi)
 
 options = optimoptions('paretosearch','ParetoSetSize',45,...
-    'ParetoSetChangeTolerance',1e-3,'PlotFcn','psplotparetof',...
+    'ParetoSetChangeTolerance',1e-4,'PlotFcn','psplotparetof',...
     'InitialPoints',x_Prop,'UseParallel',false);
 % Pareto search
-[x_Prop,fval_Prop,exitflag,output] = paretosearch(fitness_funct,length(ub_Prop),A,B,[],[],lb_Prop,ub_Prop,[],options)
+[x_Prop,fval_Prop,exitflag,output] = paretosearch(fitness_funct,length(ub_Prop),A,B,[],[],lb_Prop,ub_Prop,[],options);
 %% Full aircraft optimization
 
 ub(28) = fval_airframe/2+30;
@@ -199,10 +205,10 @@ options.DistanceMeasureFcn = {@distancecrowding,'genotype'};
 options = optimoptions(options,'ParetoFraction',0.15);
 
 %Stop Criteria
-options = optimoptions(options,'FunctionTolerance',1e-3,'MaxGenerations',1000000,'MaxStallGenerations',50);%,'MaxTime',3600*10
+options = optimoptions(options,'FunctionTolerance',1e-3,'MaxGenerations',1000000,'MaxStallGenerations',100);%,'MaxTime',3600*10
 options = optimoptions(options,'UseParallel',false);
 options = optimoptions(options,'PopulationSize',300);
-options = optimoptions(options,'Display','iter');
+%options = optimoptions(options,'Display','iter');
 % ,'MaxTime',43200
 %Constraints
 B=[];
@@ -228,15 +234,17 @@ fitness_funct = @(pars)Cost_function_optiv5neural(TAS,TAS2,Altitude,pars,dir,fil
 
 %Pareto search
 options = optimoptions('paretosearch','ParetoSetSize',45,...
-    'ParetoSetChangeTolerance',1e-3,'PlotFcn','psplotparetof',...
+    'ParetoSetChangeTolerance',1e-4,'PlotFcn','psplotparetof',...
     'InitialPoints',x,'UseParallel',false);
 
-[x,fval,exitflag,output] = paretosearch(fitness_funct,length(x),A,B,[],[],lb,ub,[],options)
+[x,fval,exitflag,output] = paretosearch(fitness_funct,length(x),A,B,[],[],lb,ub,[],options);
 
+time_three_stages = toc(tstart)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% NOW, perform optimization from one go, without sub-optimizations
+tstart2 = tic();
 
 ub(28) = fval_airframe/2+200;
 lb(28) = fval_airframe/2-200;
@@ -251,10 +259,10 @@ options.DistanceMeasureFcn = {@distancecrowding,'genotype'};
 options = optimoptions(options,'ParetoFraction',0.15);
 
 %Stop Criteria
-options = optimoptions(options,'FunctionTolerance',1e-2,'MaxGenerations',1000000,'MaxStallGenerations',100,'MaxTime',3600*24*7)
+options = optimoptions(options,'FunctionTolerance',1e-3,'MaxGenerations',1000000,'MaxStallGenerations',100);%,'MaxTime',3600*24*7)
 options = optimoptions(options,'UseParallel',false);
 options = optimoptions(options,'PopulationSize',300);
-options = optimoptions(options,'Display','iter');
+%options = optimoptions(options,'Display','iter');
 % ,'MaxTime',43200
 %Constraints
 B=[];
@@ -270,7 +278,9 @@ fitness_funct = @(pars)Cost_function_optiv5neural(TAS,TAS2,Altitude,pars,dir,fil
 [x_FULL,fval_FULL,exitflag_FULL,output_FULL,population_FULL,scores_FULL] = gamultiobj(fitness_funct,length(ub),A,B,[],[],lb,ub,[],options);
 
 options = optimoptions('paretosearch','ParetoSetSize',45,...
-    'ParetoSetChangeTolerance',1e-3,'PlotFcn','psplotparetof',...
+    'ParetoSetChangeTolerance',1e-4,'PlotFcn','psplotparetof',...
     'InitialPoints',x_FULL,'UseParallel',false);
 
 [x_FULL,fval_FULL,exitflag_FULL,output_FULL] = paretosearch(fitness_funct,length(x_FULL),A,B,[],[],lb,ub,[],options)
+
+time_one_stage = toc(tstart2)
